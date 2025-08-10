@@ -1,0 +1,2 @@
+BattView is intended to allow quick review of your battery level (percentage) because the status bar (either in a traditional DE like Gnome or KDE, or in a tiling manager using waybar, for example) is not present. This uses QT and allows the use a keyboard combo to show the prompt. Its purpose is simple to allow the quick review of your current battery status. 
+<img width="1920" height="1200" alt="BattView-desktop" src="https://github.com/user-attachments/assets/355877bc-cc0b-48f5-9030-c17de47cf540" />
