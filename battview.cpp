@@ -13,13 +13,15 @@ Copyright: Matthew Mueller
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
-    // check the battery capacity file
+    // Check the battery capacity and status files
     std::string bat_capacity_path;
+    std::string bat_status_path;
     namespace fs = std::filesystem;
     for (const auto& entry : fs::directory_iterator("/sys/class/power_supply")) {
         std::string dir_name = entry.path().filename().string();
         if (dir_name.find("BAT") == 0) {
             bat_capacity_path = entry.path() / "capacity";
+            bat_status_path = entry.path() / "status";
             break;
         }
     }
@@ -34,12 +36,25 @@ int main(int argc, char *argv[]) {
         percent = -1;
     }
 
-    std::string text = "Battery: " + (percent != -1 ? std::to_string(percent) + "%" : "Not found");
+    // Read battery status
+    std::string status = "Unknown";
+    if (!bat_status_path.empty()) {
+        std::ifstream status_file(bat_status_path);
+        std::getline(status_file, status);  // Read the full line for status
+    }
+
+    // Construct display text
+    std::string text;
+    if (percent != -1) {
+        text = "Battery: " + std::to_string(percent) + "% (" + status + ")";
+    } else {
+        text = "Not found";
+    }
 
     QLabel label(QString::fromStdString(text));
     label.setFont(QApplication::font());
     label.setAlignment(Qt::AlignCenter);
-    label.setFixedSize(150, 50);  // Make it a small window
+    label.setFixedSize(160, 50);  // Make it a small window
     label.show();
 
     // Close after 2 seconds
