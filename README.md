@@ -2,4 +2,5 @@ BattView is intended to allow quick review of your battery level (percentage) an
 
 You can move the binary to /usr/local/bin/ and give it permissions to run, then you would set a keycombo in your hyprland.conf similar to this: 
 ```bind = SUPER, B, exec, BattView
+
 <img width="1920" height="1200" alt="image" src="https://github.com/user-attachments/assets/41d82809-9e62-4565-84b9-92f0bc1ac027" />
