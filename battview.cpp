@@ -1,6 +1,7 @@
 /*
 Battview main. Simple and efficient.
 Copyright: Matthew Mueller
+Modified to include CPU temperature and fan RPM using ectool.
 */
 
 #include <QApplication>
@@ -9,6 +10,20 @@ Copyright: Matthew Mueller
 #include <fstream>
 #include <string>
 #include <filesystem>
+#include <cstdio>
+#include <sstream>
+
+std::string get_command_output(const std::string& cmd) {
+    std::string result;
+    FILE* pipe = popen(cmd.c_str(), "r");
+    if (!pipe) return "";
+    char buffer[128];
+    while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+        result += buffer;
+    }
+    pclose(pipe);
+    return result;
+}
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
@@ -48,13 +63,47 @@ int main(int argc, char *argv[]) {
     if (percent != -1) {
         text = "Battery: " + std::to_string(percent) + "% (" + status + ")";
     } else {
-        text = "Not found";
+        text = "Battery not found";
+    }
+
+    // Get CPU temperature (assuming sensor 1 is CPU, in Kelvin)
+    std::string temps_output = get_command_output("ectool temps 1");
+    int cpu_temp_c = -1;
+    size_t pos = temps_output.find("= ");
+    if (pos != std::string::npos) {
+        std::stringstream ss(temps_output.substr(pos + 1));
+        int temp_k;
+        if (ss >> temp_k) {
+            cpu_temp_c = temp_k;
+        }
+    }
+    text += "\nCPU Temp: ";
+    if (cpu_temp_c != -1) {
+        text += std::to_string(cpu_temp_c) + " C";
+    } else {
+        text += "N/A";
+    }
+
+    // Get fan RPM
+    std::string fan_output = get_command_output("ectool pwmgetfanrpm");
+    int fan_rpm = -1;
+    size_t rpm_pos = fan_output.find("RPM: ");
+    if (rpm_pos != std::string::npos) {
+        std::stringstream ss(fan_output.substr(rpm_pos + 5));
+        ss >> fan_rpm;
+    }
+    text += "\nFan RPM: ";
+    if (fan_rpm != -1) {
+        text += std::to_string(fan_rpm);
+    } else {
+        text += "N/A";
     }
 
     QLabel label(QString::fromStdString(text));
     label.setFont(QApplication::font());
     label.setAlignment(Qt::AlignCenter);
-    label.setFixedSize(160, 50);  // Make it a small window
+    label.setWordWrap(true);
+    label.setFixedSize(200, 100);  // Adjusted size for additional info
     label.show();
 
     // Close after 2 seconds
