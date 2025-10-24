@@ -11,4 +11,6 @@ Release 1.2 adds CPU temp and fan RPMs as well. Currently this is specifically f
 
 <img width="307" height="171" alt="image" src="https://github.com/user-attachments/assets/9a3a7a77-8259-47f2-91f3-6eae8d37c8f1" />
 
+Note: For version 1.2 you will need the ectool from Framework, and you will need to set it with chmod u+s. If you are not comfortable with this, then please stick with version 1.1 which has no ectool requirement. 
+
 Version 1.1 is still available here as the standard stable release. If you have a Framework 12 and would like this additional information, 1.2 is for you. 
